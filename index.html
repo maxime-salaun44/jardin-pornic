@@ -1074,6 +1074,156 @@ html, body {
 .mobile-tab.active { color: var(--sage-light); }
 .mobile-tab-icon { font-size: 18px; display: block; margin-bottom: 2px; }
 
+/* ── TRANSITIONS VUES SALON ── */
+.salon-view {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.salon-view.active {
+  opacity: 1;
+}
+
+/* ── CALENDRIER SAISONNIER ── */
+.calendar-view {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.calendar-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--text-light);
+  font-style: italic;
+  font-size: 13px;
+}
+.calendar-month {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  animation: slideIn 0.4s ease forwards;
+  opacity: 0;
+}
+.calendar-month:nth-child(2) { animation-delay: 0.08s; }
+.calendar-month:nth-child(3) { animation-delay: 0.16s; }
+.calendar-month:nth-child(4) { animation-delay: 0.24s; }
+.calendar-month-header {
+  background: var(--bark);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.calendar-month-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  color: var(--cream);
+}
+.calendar-month-season {
+  font-size: 11px;
+  color: var(--bark-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.calendar-actions {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.calendar-action {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+  color: #555;
+  line-height: 1.4;
+}
+.calendar-action-emoji { flex-shrink: 0; font-size: 14px; }
+.calendar-action-plant {
+  font-family: 'Playfair Display', serif;
+  font-size: 12px;
+  color: var(--bark);
+  font-style: italic;
+  margin-right: 4px;
+}
+
+/* ── MULTI-PHOTOS ── */
+.photo-strip {
+  display: flex;
+  gap: 8px;
+  padding: 0 0 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.photo-strip::-webkit-scrollbar { display: none; }
+.photo-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.photo-thumb.active { border-color: var(--sage); }
+.photo-thumb-add {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 2px dashed rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s;
+}
+.photo-thumb-add:hover { border-color: rgba(122,158,126,0.5); }
+
+.photo-main-display {
+  width: 100%;
+  height: 140px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-bottom: 8px;
+  display: none;
+}
+.photo-main-display.visible { display: block; }
+
+/* Alert photo slider */
+.alert-photo-wrap {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+}
+.alert-photo-wrap img {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+.alert-photo-count {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  font-size: 8px;
+  border-radius: 4px;
+  padding: 1px 3px;
+}
+
 /* Nav switcher (dev only) */
 .dev-nav {
   position: fixed;
@@ -1124,6 +1274,7 @@ html, body {
     <span class="view-dot" id="dot1"></span>
     <span class="view-dot" id="dot2"></span>
     <span class="view-dot" id="dot3"></span>
+    <span class="view-dot" id="dot4"></span>
   </div>
 
   <div class="salon-body">
@@ -1168,6 +1319,17 @@ html, body {
     <div class="salon-view" id="view-funfact">
       <div class="funfact-big" id="funfactBig"></div>
     </div>
+
+    <!-- VUE 4 : CALENDRIER -->
+    <div class="salon-view" id="view-calendrier">
+      <div class="view-header-label">📅 Calendrier du jardin</div>
+      <div class="calendar-view" id="calendarContent">
+        <div class="calendar-loading">
+          <div class="loading-spinner"></div>
+          <span>Génération du calendrier…</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <footer class="salon-footer">
@@ -1177,6 +1339,7 @@ html, body {
       <span class="footer-nav-btn" onclick="goToView(1)">🔴</span>
       <span class="footer-nav-btn" onclick="goToView(2)">📅</span>
       <span class="footer-nav-btn" onclick="goToView(3)">🌱</span>
+      <span class="footer-nav-btn" onclick="goToView(4)">🗓️</span>
     </div>
     <span class="footer-hint" onclick="switchView('mobile')">⚙️ Gérer</span>
   </footer>
@@ -1258,10 +1421,9 @@ html, body {
     <div class="modal-handle"></div>
     <div class="modal-title">Nouvelle plante</div>
 
-    <div class="photo-picker" onclick="document.getElementById('photoInput').click()">
-      <div class="photo-picker-icon">📷</div>
-      <div class="photo-picker-text">Prendre une photo ou choisir</div>
-      <img id="photoPreview" style="display:none;">
+    <img id="photoMainDisplay" class="photo-main-display" alt="photo principale">
+    <div class="photo-strip" id="photoStrip">
+      <div class="photo-thumb-add" onclick="document.getElementById('photoInput').click()">📷</div>
     </div>
     <input type="file" id="photoInput" accept="image/*" onchange="handlePhoto(event)">
 
@@ -1360,6 +1522,10 @@ function loadPlants() {
       renderSalon();
       renderMobile();
       document.getElementById('salonLoading').style.display = 'none';
+      // Auto-refresh conseils si > 7 jours
+      setTimeout(autoRefreshAdvice, 3000);
+      // Reset calendrier si les plantes changent
+      calendarGenerated = false;
     });
   });
 }
@@ -1369,7 +1535,7 @@ function loadPlants() {
 // ═══════════════════════════════════════
 let currentSalonView = 0;
 let rotationInterval = null;
-const TOTAL_VIEWS = 4;
+const TOTAL_VIEWS = 5;
 const ROTATION_DELAY = 30000; // 30 secondes
 
 function goToView(n) {
@@ -1380,6 +1546,8 @@ function goToView(n) {
   document.querySelectorAll('.view-dot').forEach((d, i) => {
     d.classList.toggle('active', i === n);
   });
+  // Générer calendrier à la première visite
+  if (n === 4 && !calendarGenerated) generateCalendar();
   // Reset timer
   clearInterval(rotationInterval);
   rotationInterval = setInterval(nextView, ROTATION_DELAY);
@@ -1691,9 +1859,13 @@ function openModal() {
   document.getElementById('modalOverlay').classList.add('open');
   document.getElementById('plantName').value = '';
   document.getElementById('plantNotes').value = '';
-  document.getElementById('photoPreview').style.display = 'none';
   document.getElementById('aiStatus').classList.remove('visible');
+  const main = document.getElementById('photoMainDisplay');
+  if (main) { main.src=''; main.classList.remove('visible'); }
+  const strip = document.getElementById('photoStrip');
+  if (strip) strip.innerHTML = '<div class="photo-thumb-add" onclick="document.getElementById('photoInput').click()">📷</div>';
   currentPhotoBase64 = null;
+  currentPhotos = [];
 }
 
 function closeModal() {
@@ -1713,13 +1885,19 @@ async function handlePhoto(event) {
 
   const reader = new FileReader();
   reader.onload = async (e) => {
-    currentPhotoBase64 = e.target.result.split(',')[1];
-    const preview = document.getElementById('photoPreview');
-    preview.src = e.target.result;
-    preview.style.display = 'block';
+    const dataUrl = e.target.result;
+    const b64 = dataUrl.split(',')[1];
 
-    // Identifier la plante avec Claude
-    await identifyPlant(currentPhotoBase64);
+    // Ajouter à la liste
+    currentPhotos.push(b64);
+    const idx = currentPhotos.length - 1;
+    currentPhotoBase64 = b64; // dernière photo = principale pour l'IA
+
+    addPhotoToStrip(dataUrl, idx);
+    selectPhoto(idx, dataUrl);
+
+    // Identifier seulement pour la 1ère photo
+    if (idx === 0) await identifyPlant(b64);
   };
   reader.readAsDataURL(file);
 }
@@ -1812,14 +1990,15 @@ async function savePlant() {
     plantData = await generateAdvice(name);
   }
 
-  // Photo redimensionnée et stockée directement en base64 (pas de Storage payant)
+  // Photos redimensionnées et stockées en base64
   let photoUrl = null;
-  if (currentPhotoBase64) {
+  let photos = [];
+  for (const b64 of currentPhotos) {
     try {
-      photoUrl = await resizeImage(currentPhotoBase64, 300);
-    } catch(e) {
-      console.warn('Redimensionnement échoué', e);
-    }
+      const resized = await resizeImage(b64, 300);
+      photos.push(resized);
+      if (!photoUrl) photoUrl = resized; // 1ère photo = principale
+    } catch(e) { console.warn('Resize failed'); }
   }
 
   const newPlant = {
@@ -1831,6 +2010,7 @@ async function savePlant() {
     statusLabel: plantData.statusLabel || 'En bonne santé',
     notes: document.getElementById('plantNotes').value.trim(),
     photoUrl: photoUrl,
+    photos: photos,
     createdAt: Date.now()
   };
 
@@ -1893,6 +2073,122 @@ function deletePlant(id) {
 // ═══════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════
+
+// ═══════════════════════════════════════
+// CALENDRIER SAISONNIER (Claude IA)
+// ═══════════════════════════════════════
+let calendarGenerated = false;
+
+async function generateCalendar() {
+  if (calendarGenerated) return;
+  const plantList = Object.values(plants);
+  if (plantList.length === 0) {
+    document.getElementById('calendarContent').innerHTML = `<div class="calendar-loading">Ajoutez des plantes pour générer le calendrier !</div>`;
+    return;
+  }
+
+  const plantNames = plantList.map(p => p.name).join(', ');
+  const currentMonth = new Date().getMonth() + 1;
+
+  try {
+    const response = await fetch('/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5-20250929',
+        max_tokens: 1200,
+        messages: [{
+          role: 'user',
+          content: `Jardinage à Pornic (climat océanique). Plantes: ${plantNames}.
+Génère un calendrier des 4 prochains mois à partir du mois ${currentMonth}.
+Réponds UNIQUEMENT en JSON valide sans markdown:
+[{"mois":"Juin","saison":"Été","actions":[{"plante":"Rosier","emoji":"✂️","action":"Tailler après floraison"},{"plante":"Hortensia","emoji":"💧","action":"Arrosage copieux 2x/semaine"}]},...]
+Maximum 3 actions par mois. Uniquement des actions concrètes et utiles.`
+        }]
+      })
+    });
+    const data = await response.json();
+    let text = data.content[0].text.trim().replace(/```json/g,'').replace(/```/g,'').trim();
+    const months = JSON.parse(text);
+
+    let html = '';
+    months.forEach(m => {
+      const actionsHTML = m.actions.map(a => `
+        <div class="calendar-action">
+          <span class="calendar-action-emoji">${a.emoji}</span>
+          <span><span class="calendar-action-plant">${a.plante} —</span>${a.action}</span>
+        </div>`).join('');
+      html += `
+        <div class="calendar-month">
+          <div class="calendar-month-header">
+            <span class="calendar-month-name">${m.mois}</span>
+            <span class="calendar-month-season">${m.saison}</span>
+          </div>
+          <div class="calendar-actions">${actionsHTML}</div>
+        </div>`;
+    });
+
+    document.getElementById('calendarContent').innerHTML = html;
+    calendarGenerated = true;
+
+  } catch(e) {
+    document.getElementById('calendarContent').innerHTML = `<div class="calendar-loading">Calendrier indisponible pour le moment.</div>`;
+  }
+}
+
+// ═══════════════════════════════════════
+// AUTO-REFRESH CONSEILS (7 jours)
+// ═══════════════════════════════════════
+async function autoRefreshAdvice() {
+  const now = Date.now();
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+  const plantList = Object.entries(plants);
+
+  for (const [id, plant] of plantList) {
+    const lastUpdate = plant.lastAdviceUpdate || 0;
+    if (now - lastUpdate > WEEK) {
+      try {
+        const newData = await generateAdvice(plant.name);
+        waitFirebase(() => {
+          window._update(window._ref(window._db, `plants/${id}`), {
+            advice: newData.advice,
+            alertType: newData.alertType,
+            alertTag: newData.alertTag,
+            statusLabel: newData.statusLabel,
+            lastAdviceUpdate: now
+          });
+        });
+        // Petite pause entre les appels
+        await new Promise(r => setTimeout(r, 1000));
+      } catch(e) { console.warn('Auto-refresh failed for', plant.name); }
+    }
+  }
+}
+
+// ═══════════════════════════════════════
+// MULTI-PHOTOS
+// ═══════════════════════════════════════
+let currentPhotos = []; // array of base64
+let selectedPhotoIndex = 0;
+
+function addPhotoToStrip(base64DataUrl, index) {
+  const strip = document.getElementById('photoStrip');
+  if (!strip) return;
+  const thumb = document.createElement('img');
+  thumb.className = 'photo-thumb' + (index === 0 ? ' active' : '');
+  thumb.src = base64DataUrl;
+  thumb.onclick = () => selectPhoto(index, base64DataUrl);
+  strip.insertBefore(thumb, strip.lastElementChild); // before the + button
+}
+
+function selectPhoto(index, src) {
+  selectedPhotoIndex = index;
+  const main = document.getElementById('photoMainDisplay');
+  if (main) { main.src = src; main.classList.add('visible'); }
+  document.querySelectorAll('.photo-thumb').forEach((t,i) => {
+    t.classList.toggle('active', i === index);
+  });
+}
 
 // ═══════════════════════════════════════
 // UTILITAIRES
