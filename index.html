@@ -1860,7 +1860,7 @@ function openModal() {
   const main = document.getElementById('photoMainDisplay');
   if (main) { main.src=''; main.classList.remove('visible'); }
   const strip = document.getElementById('photoStrip');
-  if (strip) strip.innerHTML = '<div class="photo-thumb-add" onclick="document.getElementById('photoInput').click()">📷</div>';
+  if (strip) { strip.innerHTML = ''; const btn = document.createElement("div"); btn.className = "photo-thumb-add"; btn.textContent = "📷"; btn.onclick = () => document.getElementById("photoInput").click(); strip.appendChild(btn); }
   currentPhotoBase64 = null;
   currentPhotos = [];
 }
